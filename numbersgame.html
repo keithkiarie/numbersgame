@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Number Memory</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #eee;
+        }
+
+        a {
+            display: inline-block;
+            border: 1px solid #333;
+            border-radius: 5px;
+            text-align: center;
+            width: 20vw;
+            height: 10vw;
+            line-height: 10vw;
+            margin: 2%;
+            font-size: 6vw;
+            text-decoration: none;
+            color: inherit;
+            background: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease-in-out;
+        }
+
+        input {
+            background: transparent;
+            width: 90%;
+            border: 0;
+            outline: none;
+            font-size: 50px;
+            margin: 30px 0;
+            text-align: center;
+        }
+    </style>
+    <link rel="icon" 
+      type="image/png/ico" 
+      href="https://www.duma.co.ke/favicon.png">
+</head>
+
+<body>
+
+    <div class="container">
+        <div align="center" id="game" style="display: none;">
+            <input type="number" id="display" oninput="verifier()" autofocus="autofocus">
+            <br>
+            <b>
+                <span id="div" style="font-size: 40px;">
+                    <br>
+                </span>
+            </b>
+            <br>
+            <br>
+            <br>
+            <div align="center">
+                <a href="#" onclick="quit()" id="quit">
+                    <b>Quit</b>
+                </a>
+            </div>
+        </div>
+
+        <div align="center" id="menu">
+            <br>
+            <div align="right">
+                <a href="#" onclick="signin()" style="width: 8vw; height: 3vw; font-size: 2vw; line-height: 3vw;" id="signin">
+                    <b>Sign in</b>
+                </a>
+                <div id="signindiv"></div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <table>
+                <tr>
+                    <td>
+                        <a href="#" onclick="gamestart()" id="start">
+                            <b>Start</b>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="#" id="highscores" data-toggle="modal" onclick="scoresmodal()" data-target="#myModal">
+                            <b>Scores</b>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <!-- Triggering the help modal -->
+                        <a href="#" id="help" data-toggle="modal" onclick="helpmodal()" data-target="#myModal">
+                            <b>Help</b>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            <b>
+                <span id="menudisplay"></span>
+            </b>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" align="left">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="modaltitle">Help</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="helpdiv">
+                        <h5>How To Play:</h5>
+                        <ul>
+                            <li>The goal is to memorize as many digits as possible.</li>
+                            <li>When the first digit pops up, key in that digit.</li>
+                            <li>When the second digit pops up, key in the two digits beginning with the first digit that popped
+                                up followed by the second digit to pop up</li>
+                            <li>Continue in this way, waiting for a digit to pop up then keying in all the digits in order of
+                                their apperance beginning with the first.</li>
+                        </ul>
+                        <h5>Tips:</h5>
+                        <ul>
+                            <li>For the app to be able to store your score, be sure to sign in.</li>
+                            <li>Cheaters never win and winners never cheat</li>
+                        </ul>
+                    </div>
+                    <div id="scoresdiv">
+                        <table>
+                            <tbody id="scorestable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- The surrounding HTML is left untouched by FirebaseUI.
+     Your app may use that space for branding, controls and other customizations.-->
+    <h1>Welcome to My Awesome App</h1>
+    <div id="firebaseui-auth-container"></div>
+    <div id="loader">Loading...</div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-firestore.js"></script>
+
+    <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
+    <script src="numbersgame.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+
+    <script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker
+					.register('../sw_cached_pages.js')
+					.then(reg => console.log('Service Worker: Registered'))
+					.catch(err => console.log(`Service Worker: Error: ${err}`));
+			});
+		}
+	
+        var numbers = "";
+        var last;
+        var score;
+
+        function signin() {
+            document.getElementById("menu").style.display = "none";
+            // Initialize the FirebaseUI Widget using Firebase.
+            var ui = new firebaseui.auth.AuthUI(firebase.auth());
+            var uiConfig = {
+                callbacks: {
+                    signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+                        // User successfully signed in.
+                        // Return type determines whether we continue the redirect automatically
+                        // or whether we leave that to developer to handle.
+                        return true;
+                    },
+                    uiShown: function () {
+                        // The widget is rendered.
+                        // Hide the loader.
+                        document.getElementById('loader').style.display = 'none';
+                    }
+                },
+                // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+                signInFlow: 'popup',
+                signInSuccessUrl: 'numbersgame.html',
+                signInOptions: [
+                    // Leave the lines as is for the providers you want to offer your users.
+                    firebase.auth.GoogleAuthProvider.PROVIDER_ID
+                ],
+                // Terms of service url.
+                tosUrl: 'numbersgame.html'
+            };
+            // The start method will wait until the DOM is loaded.
+            ui.start('#firebaseui-auth-container', uiConfig);
+
+        }
+
+        firebase.firestore().enablePersistence()
+            .then(function () {
+                // Initialize Cloud Firestore through firebase
+                var db = firebase.firestore();
+            })
+            .catch(function (err) {
+                if (err.code == 'failed-precondition') {
+                    // Multiple tabs open, persistence can only be enabled
+                    // in one tab at a a time.
+                    // ...
+                } else if (err.code == 'unimplemented') {
+                    // The current browser does not support all of the
+                    // features required to enable persistence
+                    // ...
+                }
+            });
+
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                // User is signed in.
+                document.getElementById("signindiv").innerHTML =
+                    "<img width='42' style='border-radius:50%' onclick='signin()' height='42' src = '" + user.photoURL +
+                    "' alt = '" +
+                    user.displayName + "'>";
+                document.getElementById("signin").style.display = "none";
+            } else {
+                // No user is signed in.
+                document.getElementById("signin").style.display = "block";
+                document.getElementById("signindiv").innerHTML = "";
+            }
+        });
+
+        function helpmodal() {
+            document.getElementById("helpdiv").style.display = "block";
+            document.getElementById("scoresdiv").style.display = "none";
+            document.getElementById("modaltitle").innerHTML = "Help";
+        }
+
+        function scoresmodal() {
+            document.getElementById("helpdiv").style.display = "none";
+            document.getElementById("scoresdiv").style.display = "block";
+            document.getElementById("modaltitle").innerHTML = "Scores";
+            document.getElementById("scorestable").innerHTML = "Loading...";
+
+            db.collection("users").orderBy("highscore", "desc").where("highscore", ">=", 5)
+
+                .get()
+                .then(function (querySnapshot) {
+                    document.getElementById("scorestable").innerHTML = "";
+                    querySnapshot.forEach(function (doc) {
+                        // doc.data() is never undefined for query doc snapshots
+                        var players = doc.data();
+                        document.getElementById("scorestable").innerHTML += "<tr><td>" + players.Name +
+                            " </td><td> : " + players.highscore + "</td></tr>"
+                    });
+                })
+                .catch(function (error) {
+                    console.log("Error getting documents: ", error);
+                });
+
+        }
+
+        function verifier() {
+            if (document.getElementById("display").value.length == numbers.length) {
+                if (numbers == document.getElementById("display").value) {
+                    document.getElementById("div").innerHTML = "Correct!";
+                    setTimeout(randomizer, 1000);
+                } else {
+                    document.getElementById("div").innerHTML = "<span style='color:red;'>Wrong!</span>";
+                    score = eval(numbers.length - 1);
+                    setTimeout(quit, 1000);
+
+                    var user = firebase.auth().currentUser;
+                    var uname, uid;
+                    if (user != null) {
+                        uname = user.displayName;
+                        uid = user.uid; // The user's ID, unique to the Firebase project. Do NOT use
+                        // this value to authenticate with your backend server, if
+                        // you have one. Use User.getToken() instead.
+
+                        var docRef = db.collection("users").doc(uid);
+                        docRef.get().then(function (doc) {
+                            if (doc.exists) {
+                                var returneddata = doc.data();
+                                if (returneddata.highscore < score) {
+                                    // Add the current score
+                                    db.collection("users").doc(uid).set({
+                                            Name: uname,
+                                            highscore: score
+                                        })
+                                        .then(function () {
+                                            console.log("Document successfully written!");
+                                        })
+                                        .catch(function (error) {
+                                            console.error("Error writing document: ", error);
+                                        });
+                                } else {
+                                    console.log("Current score less than high score");
+                                }
+
+                            } else {
+                                // doc.data() will be undefined in this case
+                                // Add a new score
+                                db.collection("users").doc(uid).set({
+                                        Name: uname,
+                                        highscore: score
+                                    })
+                                    .then(function () {
+                                        console.log("Document successfully written!");
+                                    })
+                                    .catch(function (error) {
+                                        console.error("Error writing document: ", error);
+                                    });
+                            }
+                        }).catch(function (error) {
+                            console.log("Error getting document:", error);
+                        });
+                    }
+                }
+            }
+        }
+
+        function gamestart() {
+            numbers = "";
+            last = "";
+            score = "";
+            randomizer();
+        }
+
+        function randomizer() {
+            document.getElementById("div").innerHTML = "";
+            document.getElementById("display").value = "";
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("game").style.display = "block";
+
+            last = Math.floor(Math.random() * 10);
+            numbers += last;
+            document.getElementById("div").innerHTML = last;
+            window.setTimeout(fadeout, 1500);
+        }
+
+        function fadeout() {
+            document.getElementById("display").disabled = false;
+            document.getElementById("div").innerHTML = "";
+            document.getElementById("display").focus();
+        }
+
+        function quit() {
+            if (score == undefined || score == "") {
+                document.getElementById("menudisplay").innerHTML = "<br>";
+            } else {
+                document.getElementById("menudisplay").innerHTML = "You memorized: " + score + " digits.";
+            }
+            document.getElementById("menu").style.display = "block";
+            document.getElementById("game").style.display = "none";
+            document.getElementById("display").value = "";
+            numbers = "";
+            last = "";
+            document.getElementById("display").disabled = true;
+        }
+
+        $('.row a').on('click', function () {
+            var $store = $('input'),
+                $number = $('.call'),
+                dialed = $(this).text();
+
+            $store.val($store.val() + dialed);
+            $number.attr('href', 'tel:' + $store.val());
+            $store.focus();
+        });
+    </script>
+</body>
+
+</html>
