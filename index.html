@@ -2,10 +2,15 @@
 <html lang="en">
 
 <head>
+    <meta name="Numbers Game" content="Arcade, memory Game. Memorize an increasing number of digits.">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Number Memory</title>
+    <title>Numbers Game</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" type="image/png/ico" href="icon.png">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -52,9 +57,6 @@
             text-align: center;
         }
     </style>
-    <link rel="icon" 
-      type="image/png/ico" 
-      href="https://www.duma.co.ke/favicon.png">
 </head>
 
 <body>
@@ -81,7 +83,8 @@
         <div align="center" id="menu">
             <br>
             <div align="right">
-                <a href="#" onclick="signin()" style="width: 8vw; height: 3vw; font-size: 2vw; line-height: 3vw;" id="signin">
+                <a href="#" onclick="signin()" style="width: 8vw; height: 3vw; font-size: 2vw; line-height: 3vw;"
+                    id="signin">
                     <b>Sign in</b>
                 </a>
                 <div id="signindiv"></div>
@@ -137,9 +140,11 @@
                         <ul>
                             <li>The goal is to memorize as many digits as possible.</li>
                             <li>When the first digit pops up, key in that digit.</li>
-                            <li>When the second digit pops up, key in the two digits beginning with the first digit that popped
+                            <li>When the second digit pops up, key in the two digits beginning with the first digit that
+                                popped
                                 up followed by the second digit to pop up</li>
-                            <li>Continue in this way, waiting for a digit to pop up then keying in all the digits in order of
+                            <li>Continue in this way, waiting for a digit to pop up then keying in all the digits in
+                                order of
                                 their apperance beginning with the first.</li>
                         </ul>
                         <h5>Tips:</h5>
@@ -177,15 +182,15 @@
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
 
     <script>
-		if ('serviceWorker' in navigator) {
-			window.addEventListener('load', () => {
-				navigator.serviceWorker
-					.register('../sw_cached_pages.js')
-					.then(reg => console.log('Service Worker: Registered'))
-					.catch(err => console.log(`Service Worker: Error: ${err}`));
-			});
-		}
-	
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker
+                    .register('sw_cached_pages.js')
+                    .then(reg => console.log('Service Worker: Registered'))
+                    .catch(err => console.log(`Service Worker: Error: ${err}`));
+            });
+        }
+
         var numbers = "";
         var last;
         var score;
@@ -210,13 +215,13 @@
                 },
                 // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
                 signInFlow: 'popup',
-                signInSuccessUrl: 'numbersgame.html',
+                signInSuccessUrl: '/numbersgame',
                 signInOptions: [
                     // Leave the lines as is for the providers you want to offer your users.
                     firebase.auth.GoogleAuthProvider.PROVIDER_ID
                 ],
                 // Terms of service url.
-                tosUrl: 'numbersgame.html'
+                tosUrl: '/numbersgame'
             };
             // The start method will wait until the DOM is loaded.
             ui.start('#firebaseui-auth-container', uiConfig);
@@ -244,7 +249,8 @@
             if (user) {
                 // User is signed in.
                 document.getElementById("signindiv").innerHTML =
-                    "<img width='42' style='border-radius:50%' onclick='signin()' height='42' src = '" + user.photoURL +
+                    "<img width='42' style='border-radius:50%' onclick='signin()' height='42' src = '" + user
+                    .photoURL +
                     "' alt = '" +
                     user.displayName + "'>";
                 document.getElementById("signin").style.display = "none";
